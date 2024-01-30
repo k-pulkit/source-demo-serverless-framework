@@ -1,0 +1,58 @@
+service: Lab8
+frameworkVersion: '3'
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: dev
+  region: us-east-1
+
+plugins:
+  - serverless-step-functions
+
+stepFunctions:
+  stateMachines:
+    helloWorld:
+      definition:
+        Comment: "A simple step function to send SMS message"
+        StartAt: Start
+        States:
+          Start:
+            Type: Wait
+            Seconds: 5
+            Next: Send
+          Send:
+            Type: Task
+            Resource: "arn:aws:states:::sns:publish"
+            Parameters:
+              TopicArn:
+                Ref: TopicA
+              Message: "A simple enough message"
+            Catch:
+              - ErrorEquals:
+                  - States_TaskFailed
+                Next: End
+            Next: End
+          End:
+            Type: Succeed
+
+resources:
+  Resources:
+    TopicA:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: TestTopicA
+    PhoneNotification:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Protocol: sms
+        Endpoint: ${env:PHONE_NUMBER}
+        TopicArn:
+          Ref: TopicA
+
+
+
+          
+          
