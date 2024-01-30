@@ -1,0 +1,14 @@
+service: Lab2
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.9
+  stage: dev
+  region: us-east-1
+
+functions:
+  CronFunction:
+    handler: handler.run
+    events:
+      - schedule: rate(5 minutes)
