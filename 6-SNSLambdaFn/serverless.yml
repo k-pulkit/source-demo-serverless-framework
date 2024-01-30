@@ -1,0 +1,36 @@
+service: Lab6
+frameworkVersion: '3'
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: dev
+  region: us-east-1
+
+  environment:
+    Topic: ${env:Topic}
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - sns: 
+          arn:
+            Ref: SuperTopic
+          topicName: "${env:Topic}"
+
+# you can add CloudFormation resource templates here
+resources:
+  Resources:
+    SuperTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${env:Topic}
+  Outputs:
+    SNSTopicArn:
+      Description: ARN of the topic created
+      Value: 
+        Ref: SuperTopic
+      Export:
+        Name: SNSArnValue
