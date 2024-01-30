@@ -1,0 +1,52 @@
+
+service: Lab4
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: dev
+  region: us-east-1
+  memorySize: 2000
+  timeout: 30
+  architecture: x86_64
+  stackTags:
+    project: learning
+    env: ${self:provider.stage}
+    terraform: "false"
+
+  # you can define service wide environment variables here
+  environment:
+    username: testuser
+
+plugins:
+  - serverless-add-api-key
+
+custom:
+  apiKeys:
+      - name: testuser
+        usagePlan:
+          name: FreePlan
+          description: Test plan with rate limit
+          quota:
+            limit: 2
+            period: DAY
+          throttle:
+            burstLimit: 100
+            rateLimit: 10
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: /hello
+          method: post
+          private: true
+
+
+
+#    Define function environment variables here
+#    environment:
+#      variable2: value2
