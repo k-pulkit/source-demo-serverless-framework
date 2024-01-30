@@ -1,0 +1,38 @@
+service: Lab5
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: dev
+  region: us-east-1
+
+# Cloudformation
+resources:
+ Resources:
+   TestTable:
+     Type: AWS::DynamoDB::Table
+     Properties:
+       TableName: TestTable
+       AttributeDefinitions:
+        - AttributeName: email
+          AttributeType: S
+        - AttributeName: userid
+          AttributeType: S
+       KeySchema:
+        - AttributeName: email
+          KeyType: HASH
+        - AttributeName: userid
+          KeyType: RANGE
+       BillingMode: PROVISIONED
+       ProvisionedThroughput: 
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+       Tags: 
+        - Key: Env
+          Value: ${self:provider.stage}
+
+ Outputs:
+    DynamoTableARN:
+      Description: "ARN of table created"
+      Value: Fn::GetAtt [TestTable Arn]
